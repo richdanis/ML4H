@@ -1,0 +1,13 @@
+numpy==1.24.2
+scipy==1.9.1
+matplotlib==3.6.0
+scikit-learn==1.2.1
+pandas==1.5.3
+GradCAM
+tqdm
+shap
+cv2
+captum
+seaborn
+torch
+torchvision
