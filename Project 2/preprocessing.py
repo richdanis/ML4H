@@ -4,6 +4,7 @@ from nltk.stem import WordNetLemmatizer
 import pandas as pd
 import string
 import re
+import math
 
 def remove_nans(data):
 
@@ -108,3 +109,63 @@ def preprocess(data):
     data['TweetText'] = joined
 
     return data
+
+def make_split(data):
+  # makes 80/10/10 train/val/test split
+  # and saves them in the data folder
+
+  # shuffle the rows since ordered by date
+  data = data.sample(frac=1, random_state=42)
+
+  # get the classes
+  classes = pd.unique(data['Sentiment']).tolist()
+
+  test = val = train = None
+
+  for c in classes:
+
+    select = data[data['Sentiment'] == c]
+    up = math.ceil(0.1 * select.shape[0])
+    if test is None:
+      test = select[:up]
+      val = select[up:2*up]
+      train = select[2*up:]
+    else:
+      test = pd.concat([test, select[:up]], ignore_index=True)
+      val = pd.concat([val, select[up:2*up]], ignore_index=True)
+      train = pd.concat([train, select[2*up:]], ignore_index=True)
+
+  # shuffle 
+  test = test.sample(frac=1, random_state=42)
+  val = val.sample(frac=1, random_state=42)
+  train = train.sample(frac=1, random_state=42)
+
+  test.to_csv('data/test.csv', index=False)
+  val.to_csv('data/val.csv', index=False)
+  train.to_csv('data/train.csv', index=False)
+
+def class_counts(data):
+  # can be used to check the correctness of the split
+  sentiments = data['Sentiment'].tolist()
+  comb_counts = dict()
+  for s in sentiments:
+    if s in comb_counts:
+      comb_counts[s] += 1
+    else:
+      comb_counts[s] = 1
+  print(comb_counts)
+
+
+if __name__ == '__main__':
+
+    # read data
+    data = pd.read_csv('data/TweetsCOV19.csv')
+
+    # preprocess
+    data = preprocess(data)
+
+    # save to csv
+    data.to_csv('data/cleaned_tweets.csv', index=False)
+    
+    # split into train/val/test and save in data folder
+    make_split(data)
