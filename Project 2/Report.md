@@ -2,6 +2,8 @@
 
 ### Part 1: Data pre-processing
 
+TODO: Remove duplicate rows.
+
 **Q1: Preprocessing (2 pt)** <br> 
 As a first step we remove all rows, which have NaN entries in the 'TweetText' column of the data.
 After that we remove URLs, emojis and punctuation.
