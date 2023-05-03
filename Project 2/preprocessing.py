@@ -6,9 +6,21 @@ import string
 import re
 import math
 
+# TODO: spell correction
+# TODO: emoticons to words
+
 def remove_nans(data):
 
     return data[data['TweetText'].notnull()]
+
+def remove_duplicates(data):
+
+    # if there are duplicate of sentiment and tweet, then only keep one
+    data = data.drop_duplicates(subset = ['TweetText', 'Sentiment'], keep = 'first')
+    
+    # if there are duplicate tweets left, that means that they have
+    # different sentiments, in which case we remove them
+    return data.drop_duplicates(subset = ['TweetText'], keep = False)
 
 def remove_url(tweet):
 
@@ -107,6 +119,9 @@ def preprocess(data):
         joined.append(' '.join(tweet))
 
     data['TweetText'] = joined
+
+    # remove duplicates
+    data = remove_duplicates(data)
 
     return data
 

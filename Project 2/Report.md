@@ -1,11 +1,14 @@
-## Template Report: AI for Global Health using Natural Language Processing
+## AI for Global Health using Natural Language Processing
 
 ### Part 1: Data pre-processing
 
-TODO: Remove duplicate rows.
+TODO: Remove duplicate rows. <br>
+TODO: Convert emoticons to text. <br>
+TODO: Correct spelling mistakes. <br>
 
 **Q1: Preprocessing (2 pt)** <br> 
 As a first step we remove all rows, which have NaN entries in the 'TweetText' column of the data.
+Then we remove all duplicate rows.
 After that we remove URLs, emojis and punctuation.
 In the process of tokenization, mentions are removed, all characters are converted to lower case and repeated sequences of characters of length 3 or greater are reduced to length 3.
 The last step is lemmatization, for which we use the WordNetLemmatizer from the nltk library.
@@ -121,3 +124,65 @@ We take care to shuffle the dataset before splitting it, since the tweets are or
 Furthermore we make sure to keep the class distribution as in the original dataset by propagating the 80/10/10 split to each combination of positive and negative sentiment.
 
 TODO: Possible Evaluation Challenges
+
+### Part 2: NLP learning based methods (45 pts)
+
+### VADER (5 pts)
+
+TODO: Add stuff from Chris
+
+### Word Embeddings (20 pts)
+
+**Q1: Bag of Words (2 pts)** <br>
+
+The Bag of Words method establishes the number of occurrences of each word in the dataset and keeps the top n words.
+The columns of the feature map are then the top n words and the rows are the tweets.
+Each cell then contains the number of occurrences of the word in the corresponding tweet.
+
+**[Code snippet]**
+```
+from sklearn.feature_extraction.text import CountVectorizer
+
+vectorizer = CountVectorizer(max_features=1000)
+X = vectorizer.fit_transform(data['TweetText']).toarray()
+```
+We use the count vectorizer of the sklearn library to create the feature map with the Bag of Words method.
+
+**Q2: TF-IDF (2 pts)** <br>
+
+In this method, first for each document (or tweet in our case) we calculate the term frequency ($TF$) of each word in the document.
+For a given word $w$ and document $d$ the $TF$ score is given by
+$$ 
+TF(w, d) = count(w,d) / |d|,$$
+where $count(w,d)$ is the number of occurrences of $w$ in $d$ and $|d|$ is the number of words in $d$.
+The TF score tries to capture the importance of a word in a single document.
+
+The second score of the method is the IDF.
+Here we first calculate the inverse document frequency for each word in the dataset.
+That is for each word we divide the number of all documents in the dataset by the total number of documents containing the word.
+As this inverse score might become very big we apply the logarithm.
+For a given word $w$ and dataset $D$ the IDF score is given by
+$$
+\begin{aligned}
+IDF(w, D) = log\left(\frac{|D|}{|d \in D : w \in d| + 1}\right),
+\end{aligned}
+$$
+where $|D|$ is the total number of documents and $|d \in D : w \in d|$ is the number of documents containing $w$.
+In contrast to the $TF$, the $IDF$ measures the importance across documents in the whole dataset.
+
+The final score is then given by combining $TF$ and $IDF$,
+$$
+TF\text{-}IDF(w, d, D) = TF(w, d) * IDF(w, D).
+$$
+
+Again we use the sklearn library to calculate the scores.
+In order to get a tractable feature matrix, we again restrict the method to the 1000 words with the highest $TF$ across the whole document. <br>
+**[Code snippet]**
+```
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+vectorizer = TfidfVectorizer(max_features=1000)
+X = vectorizer.fit_transform(data['TweetText'])
+```
+
+
