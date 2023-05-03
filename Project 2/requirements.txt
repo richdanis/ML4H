@@ -1,3 +1,6 @@
 nltk
 pandas
 matplotlib
+numpy
+sklearn
+vaderSentiment
