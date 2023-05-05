@@ -2,6 +2,8 @@ nltk
 pandas
 matplotlib
 numpy
+sklearn
+vaderSentiment
 scikit-learn
 vaderSentiment
 gensim
