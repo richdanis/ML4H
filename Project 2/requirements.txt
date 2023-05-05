@@ -2,5 +2,5 @@ nltk
 pandas
 matplotlib
 numpy
-sklearn
+scikit-learn
 vaderSentiment
