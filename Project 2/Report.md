@@ -12,6 +12,7 @@ Then we remove all duplicate rows.
 After that we remove URLs, emojis and punctuation.
 In the process of tokenization, mentions are removed, all characters are converted to lower case and repeated sequences of characters of length 3 or greater are reduced to length 3.
 The last step is lemmatization, for which we use the WordNetLemmatizer from the nltk library.
+Furthermore we remove duplicate rows, in this way we get rid of around 110k rows.
 
 Irregular capitalization is handled by converting every letter to lowercase.
 Lemmatization alleviates the problem of variable declinations by mapping them to the same word which captures the semantics.

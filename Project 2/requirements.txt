@@ -5,3 +5,5 @@ numpy
 scikit-learn
 vaderSentiment
 gensim
+emot
+contractions

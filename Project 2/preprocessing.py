@@ -5,9 +5,8 @@ import pandas as pd
 import string
 import re
 import math
-
-# TODO: spell correction
-# TODO: emoticons to words
+import emot
+import contractions
 
 def remove_nans(data):
 
@@ -29,6 +28,20 @@ def remove_url(tweet):
     return re.sub(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]'
            r'[a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:'
            r'\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})', '', tweet)
+
+def replace_emojis(tweet):
+
+    # replace emojis with their meaning
+    emot_obj = emot.core.emot()
+    emot_dict = emot_obj.emoji(tweet)
+    emojis = emot_dict['value']
+    meanings = emot_dict['mean']
+    unique = set((e, m) for e, m in zip(emojis, meanings))
+
+    for (e, m) in unique:
+        tweet = tweet.replace(e, m)
+
+    return tweet
 
 def remove_emojis(tweet):
 
@@ -58,14 +71,18 @@ def remove_emojis(tweet):
 
 def remove_punctuation(tweet):
 
+    # do not remove @, as it is handled by the tokenizer
+    punctuation = string.punctuation.replace("@", "")
     # remove punctuation
-    return tweet.translate(str.maketrans('', '', string.punctuation))
+    return tweet.translate(str.maketrans('', '', punctuation))
 
 def remove_symbols(row):
 
     tweet = row['TweetText']
     tweet = remove_url(tweet)
+    tweet = replace_emojis(tweet)
     tweet = remove_emojis(tweet)
+    tweet = contractions.fix(tweet, slang=False)
     tweet = remove_punctuation(tweet)
 
     return tweet
@@ -119,6 +136,9 @@ def preprocess(data):
         joined.append(' '.join(tweet))
 
     data['TweetText'] = joined
+
+    # remove NaNs again
+    data = remove_nans(data)
 
     # remove duplicates
     data = remove_duplicates(data)
