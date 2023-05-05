@@ -186,4 +186,29 @@ vectorizer = TfidfVectorizer(max_features=1000)
 X = vectorizer.fit_transform(data['TweetText'])
 ```
 
+**Q4: GloVe (2 pts)** <br>
+
+GloVe uses relies on the occurrence matrix $V$.
+This matrix has the words of the vocabulary as rows and columns.
+Each cell $V_{ij}$ contains the number of times word $i$ has co-occurred with word $j$ in the dataset.
+
+Now we can model the probability of word $i$ occurring with word $j$ as
+$$
+P_{ij} = \frac{V_{ij}}{V_i},
+$$
+where $V_i$ is the number of times word $i$ has occurred in the dataset.
+Now we introduce two matrices $U, W$ in order to model $P_{ij}$ with
+$$
+\hat{P}_{ij} = \exp(w_i^T u_j).
+$$
+So we end up with two vectors $u_i, w_i$ for each word $i$.
+The idea is find $U, W$ such that each $\hat{P}_{ij}$ is close to $P_{ij}$.
+After applying some further steps, one can then define a loss function for optimizing $U, W$ and some bias $b$. <br>
+**[Code snippet]**
+```
+```
+**Q5: FastText (2 pts)** <br>
+
+
+
 

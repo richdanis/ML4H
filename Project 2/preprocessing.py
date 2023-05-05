@@ -5,8 +5,9 @@ import pandas as pd
 import string
 import re
 import math
-import emot
+import emoji
 import contractions
+from tqdm import tqdm
 
 def remove_nans(data):
 
@@ -32,16 +33,7 @@ def remove_url(tweet):
 def replace_emojis(tweet):
 
     # replace emojis with their meaning
-    emot_obj = emot.core.emot()
-    emot_dict = emot_obj.emoji(tweet)
-    emojis = emot_dict['value']
-    meanings = emot_dict['mean']
-    unique = set((e, m) for e, m in zip(emojis, meanings))
-
-    for (e, m) in unique:
-        tweet = tweet.replace(e, m)
-
-    return tweet
+    return emoji.demojize(tweet, delimiters=(" ", " "))
 
 def remove_emojis(tweet):
 
@@ -71,8 +63,12 @@ def remove_emojis(tweet):
 
 def remove_punctuation(tweet):
 
+    # replace underscore between emoji words
+    tweet = tweet.replace("_", " ")
+
     # do not remove @, as it is handled by the tokenizer
     punctuation = string.punctuation.replace("@", "")
+
     # remove punctuation
     return tweet.translate(str.maketrans('', '', punctuation))
 
@@ -95,7 +91,7 @@ def tokenization(tweets):
     # reduce_len = True => reduce length of repeated characters
     tokenizer = TweetTokenizer(preserve_case=False, strip_handles=True, reduce_len=True)
 
-    for tweet in tweets:
+    for tweet in tqdm(tweets, desc="Tokenizing"):
         tokenized_tweets.append(tokenizer.tokenize(tweet))
 
     return tokenized_tweets
@@ -108,7 +104,7 @@ def lemmatization(tweets):
 
     lemmatizer = WordNetLemmatizer()
 
-    for tweet in tweets:
+    for tweet in tqdm(tweets, desc="Lemmatizing"):
         lemmatized_tweets.append([lemmatizer.lemmatize(word) for word in tweet])
 
     return lemmatized_tweets
@@ -121,8 +117,11 @@ def preprocess(data):
     # remove NaNs
     data = remove_nans(data)
 
+    # progress bar
+    tqdm.pandas(desc="Removing and Replacing Symbols")
+
     # remove some symbols
-    data['TweetText'] = data.apply(remove_symbols, axis=1)
+    data = data.assign(TweetText=data.progress_apply(remove_symbols, axis=1))
 
     # tokenize
     tweets = data['TweetText'].tolist()
@@ -135,7 +134,7 @@ def preprocess(data):
     for tweet in lemmatized_tweets:
         joined.append(' '.join(tweet))
 
-    data['TweetText'] = joined
+    data = data.assign(TweetText=joined)
 
     # remove NaNs again
     data = remove_nans(data)

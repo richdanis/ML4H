@@ -7,5 +7,6 @@ vaderSentiment
 scikit-learn
 vaderSentiment
 gensim
-emot
+emoji
 contractions
+tqdm
