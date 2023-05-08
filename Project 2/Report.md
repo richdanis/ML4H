@@ -206,9 +206,41 @@ The idea is find $U, W$ such that each $\hat{P}_{ij}$ is close to $P_{ij}$.
 After applying some further steps, one can then define a loss function for optimizing $U, W$ and some bias $b$. <br>
 **[Code snippet]**
 ```
+glove_embeddings = {}
+with open("embeddings/glove.twitter.27B.200d.txt", 'r') as f:
+    for line in f:
+        values = line.split()
+        word = values[0]
+        vector = np.asarray(values[1:], "float32")
+        glove_embeddings[word] = vector
 ```
 **Q5: FastText (2 pts)** <br>
 
+FastText uses a CBOW model to learn word embeddings.
+But there are several improvements.
+Position vectors are introduced for each word in the context.
+In order to encode positional information they are multiplied point wise with each word vector in the surrounding of the source word.
+Furthermore with certain probability unigrams are merged based on their mutual information.
+This is done 5-6 times to get more informative phrases.
+Another feature is the use of subword information.
+Each word is decomposed into character n-grams and their representations are learned as well.
+Finally their average is added to the word vector
+(Bojanowski et al., <em> Advances in Pre-Training Distributed Word Representations </em>, 2018). <br>
 
+We download a set of word vectors, trained on Wikipedia 2017, UMBC webbase corpus and statmt.org news dataset (16B tokens) from the fasttext website.
 
+**[Code snippet]**
+```
+import io
 
+def load_vectors(fname):
+    fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
+    n, d = map(int, fin.readline().split())
+    data = {}
+    for line in fin:
+        tokens = line.rstrip().split(' ')
+        data[tokens[0]] = np.asarray(tokens[1:], dtype=np.float16)
+    return data
+
+ft_embeddings = load_vectors('embeddings/wiki-news-300d-1M-subword.vec')
+```
