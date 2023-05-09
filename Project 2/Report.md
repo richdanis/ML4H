@@ -244,3 +244,46 @@ def load_vectors(fname):
 
 ft_embeddings = load_vectors('embeddings/wiki-news-300d-1M-subword.vec')
 ```
+
+### Transformers (20 pts) <br>
+
+**Q1: Transformer-based language models (4 pts)** <br>
+
+Transformers can consist of a single encoder neural network (BERT), a single decoder network (GPT) or a combination of both (BART).
+Encoder and decoder typically feature a stack of blocks.
+Each block then of a multi-head attention layer and a feed-forward layer.
+The attention mechanism is essential for the transformer architecture.
+The high level idea is to learn contextualized representations of words, by attending to other words in the input sequence.
+In contrast to RNNs, input sequences can be fed into transformers in parallel and not sequentially.
+This allows to train them on large text corpora in an unsupervised fashion to obtain informative representations.
+For the input word embeddings like GloVe or FastText can be used.
+
+Transformer decoders or encoder-decoders are typically trained by next word prediction.
+The predicted words are then fed back into the input of the decoder to build the sentence step by step.
+For each word the decoder can only attend to previous words.
+This is only natural, since at inference time the model has only access to its previous predictions.
+To help stabilize the training, the teacher forcing method can be used.
+That is for each predicted word, the word is corrected if it does not match the ground truth.
+
+Transformer encoders can be trained by masking input tokens and then the model has to predict them.
+An alternative task is next sentence prediction, where the model has to predict whether two sentences follow each other.
+
+BERT and RoBERTa are both transformer encoders, while GPT is a transformer decoder.
+RoBERTa is an optimized version of BERT, with the same architecture, but different pretraining procedure.
+For example BERT uses the wordpiece tokenizer,  while RoBERTa uses the byte pair encoding tokenizer.
+Furthermore RoBERTa is trained longer and on a larger corpus than BERT.
+It also features longer input sequences and larger batch sizes.
+In contrast to BERT, RoBERTa is trained without next sentence prediction.
+
+GPT-3 has much more parameters (175 Billion) than BERT (345 Million) or RoBERTa (355 Million).
+While BERT is fine-tuned for any task on which its performance is evaluated, GPT-3 already provides strong results without any fine-tuning.
+For the input embedding GPT-3 uses byte pair encoding.
+The Common Crawl dataset is used for pretraining with nearly a trillion words, which dwarves the combined 3.3 billion words of the datasets, on which BERT and RoBERTa were trained.
+
+**Q2: Scalability (2 pts)** <br>
+
+
+
+
+
+
