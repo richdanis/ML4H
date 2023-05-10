@@ -5,8 +5,10 @@ numpy
 sklearn
 vaderSentiment
 scikit-learn
-vaderSentiment
 gensim
 emoji
 contractions
 tqdm
+datasets
+transformers
+evaluate

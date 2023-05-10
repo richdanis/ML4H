@@ -142,6 +142,10 @@ def preprocess(data):
     # remove duplicates
     data = remove_duplicates(data)
 
+    # split sentiment
+    data = data.assign(PosSentiment=data['Sentiment'].apply(lambda x: x.split()[0]))
+    data = data.assign(NegSentiment=data['Sentiment'].apply(lambda x: x.split()[1]))
+
     return data
 
 def make_split(data):
