@@ -282,8 +282,82 @@ The Common Crawl dataset is used for pretraining with nearly a trillion words, w
 
 **Q2: Scalability (2 pts)** <br>
 
+**Q3: Code (2 pts)** <br>
 
+We fine-tuned the BERT model for predicting the positive sentiment of a tweet.
+The following code snippet shows our training configuration.
+We are mostly using default configurations, with some minor changes.
+As the classes are very imbalanced, we are using a class weighted cross entropy loss and subclass the trainer class for this purpose.
+We do not include this in the code snippet to keep it concise.
+```
+# download pretrained model
+model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=5).to(device)
 
+# freeze embeddings and encoder part
+for param in model.bert.embeddings.parameters():
+  param.requires_grad = False
+for param in model.bert.encoder.parameters():
+  param.requires_grad = False
 
+# unfreeze top layers of the encoder
+for param in model.bert.encoder.layer[9].parameters():
+  param.requires_grad = True
+for param in model.bert.encoder.layer[10].parameters():
+  param.requires_grad = True
+for param in model.bert.encoder.layer[11].parameters():
+  param.requires_grad = True
+
+# gather trainable parameters
+params = list(model.bert.pooler.parameters()) \
+          + list(model.classifier.parameters()) \
+          + list(model.bert.encoder.layer[11].parameters()) \
+          + list(model.bert.encoder.layer[10].parameters()) \
+          + list(model.bert.encoder.layer[9].parameters())  
+
+# assing trainable parameters to optimizer
+optim = AdamW(params=params, lr=5e-5, weight_decay=0.0)
+
+# training arguments
+training_args = TrainingArguments(output_dir="test_trainer", \
+                                  evaluation_strategy="epoch", \
+                                  per_device_eval_batch_size=32, \
+                                  per_device_train_batch_size=32, \
+                                  num_train_epochs=4.0, \
+                                  fp16=True, \
+                                  logging_strategy="epoch")
+
+# metric computation
+metric = evaluate.load("f1")
+
+def compute_metrics(eval_pred):
+    preds = eval_pred.predictions[0] if isinstance(eval_pred.predictions, tuple) else eval_pred.predictions
+    predictions = np.argmax(preds, axis=-1)
+    
+    return metric.compute(predictions=predictions, references=eval_pred.label_ids, average="weighted")
+
+trainer = WeightedTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=val_dataset,
+    compute_metrics=compute_metrics,
+    optimizers=(optim, None)
+)
+
+trainer.train()
+```
+The following screenshot shows the training progress for the above configuration.
+
+![training](plots/Transformers_Q3.png)
+
+**Q4: Performance analysis (4 pts)** <br>
+
+TODO: Analyze perfomance
+![Predictions](plots/Transformers_Q4.png)
+After our fine-tuning we get an f1 score of 0.629 on the test set.
+We propose the following approaches to improve the performance:
+1. fine-tune the entire model.
+2. train the entire model from scratch on our dataset, as it is quite large with around 600k tweets.
+3. add more encoder blocks and attention heads, similar to the scaling of GPT-3, which worked very well.
 
 
