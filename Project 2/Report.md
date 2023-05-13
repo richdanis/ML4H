@@ -438,3 +438,13 @@ We sweep across different numbers of neighbors for both the pretrained and fine-
 ![UMAP_Transformer](plots/UMAP_transformer.png)
 There is a clear difference in the visualization for the pretrained and the fine-tuned model.
 The fine-tuned model shows a clear separation between words of neutral and positive tweets, whereas in the UMAP plot of the pretrained model, there is no observable separation.
+
+### Part 3: Downstream Global Health Analysis (20 pts)
+
+**Q1: Research question (2 pts).** <br>
+Research question: how does the sentiment of tweets change over time during the COVID-19 pandemic?
+
+The COVID-19 pandemic had different stages, which were characterized by different events and regulations.
+Such as mask mandates, stay at home orders and the introduction of vaccines.
+Understanding how the sentiment of the general population changed over these times can help to understand why some measures might be more effective than others.
+These insights could then be used to inform future policies.

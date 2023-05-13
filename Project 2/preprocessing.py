@@ -109,7 +109,7 @@ def lemmatization(tweets):
 
     return lemmatized_tweets
 
-def preprocess(data):
+def preprocess(data, split=True):
 
     # download for lemmatization
     nltk.download('wordnet')
@@ -140,11 +140,13 @@ def preprocess(data):
     data = remove_nans(data)
 
     # remove duplicates
-    data = remove_duplicates(data)
+    if split:
+        data = remove_duplicates(data, split)
 
     # split sentiment
-    data = data.assign(PosSentiment=data['Sentiment'].apply(lambda x: x.split()[0]))
-    data = data.assign(NegSentiment=data['Sentiment'].apply(lambda x: x.split()[1]))
+    if split:
+        data = data.assign(PosSentiment=data['Sentiment'].apply(lambda x: x.split()[0]))
+        data = data.assign(NegSentiment=data['Sentiment'].apply(lambda x: x.split()[1]))
 
     return data
 
