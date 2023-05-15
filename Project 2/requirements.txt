@@ -12,3 +12,6 @@ tqdm
 datasets
 transformers
 evaluate
+umap-learn
+umap-learn[plot]
+accelerate
