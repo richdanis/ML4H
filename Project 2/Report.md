@@ -448,3 +448,40 @@ The COVID-19 pandemic had different stages, which were characterized by differen
 Such as mask mandates, stay at home orders and the introduction of vaccines.
 Understanding how the sentiment of the general population changed over these times can help to understand why some measures might be more effective than others.
 These insights could then be used to inform future policies.
+
+### Bonus: Emotion Analysis (+5 pts)
+
+We treat this problem as multi-class multi-label.
+First we preprocess the data using the same steps as for the sentiment analysis.
+Again we split the data into train (80%), validation(10%) and test(10%) set.
+Our idea is to use our fine-tuned BERT model from the sentiment analysis as pretrained model, since it is already trained on tweets.
+```
+# load pretrained model
+model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", \
+                                                           problem_type="multi_label_classification", \
+                                                           num_labels=11)
+                                        # load fine-tuned model
+fine_tuned = AutoModelForSequenceClassification.from_pretrained("bert_9_layers")
+
+# exchange encoder of pretrained model with encoder of fine-tuned model
+model.bert = fine_tuned.bert
+```
+Thus we exchange the classifier and fine-tune again.
+Looking at the class distribution, we notice that the classes are very imbalanced.
+
+![Emotion_Distribution](plots/emotion_analysis_labels.png)
+
+To counter this imbalance we tried to use a class weighted loss, but this performed much worse than the standard binary cross entropy loss.
+
+Optimizing the hyperparameters, we found that the best configuration was to use a learning rate of 5e-5, train for 4 epochs and unfreeze the top 9 layers of the encoder.
+The code for training is the same as in Transformers Q3.
+
+The following screenshot shows our training progress.
+We show the accuracy as well, but this is not a good metric for this problem, since predictions are only counted as correct if all 11 classes of the corresponding tweet match the ground truth.
+Which is significantly harder in comparison to binary classification.
+
+![Emotion_Training](plots/emotion_analysis_training_progress.png)
+
+On the testset we then get an f1 score of 0.7432.
+
+We visualize the UMAP embeddings of different emotions in the following plots.
