@@ -538,7 +538,6 @@ As possible explanation for this might be that in highly populated megacities pe
 
 Concluding, one can say that the Twitter sentiment is more sensitive to COVID restrictions than to the number of COVID cases. This is quite counterintuitive and surprising, which is why further research is needed to understand the underlying mechanisms.
 
-
 ### Bonus: Emotion Analysis (+5 pts)
 
 We treat this problem as multi-class multi-label.
