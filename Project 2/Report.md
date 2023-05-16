@@ -1,6 +1,6 @@
-## AI for Global Health using Natural Language Processing
+## **AI for Global Health using Natural Language Processing**
 
-### Part 1: Data pre-processing
+### **Part 1: Data pre-processing**
 
 **Q1: Preprocessing (2 pt)** <br> 
 As a first step we remove all rows, which have NaN entries in the 'TweetText' column of the data.
@@ -123,7 +123,7 @@ This already counters the issue of a potential label shift over time, as we can 
 Furthermore we make sure to keep the class distribution as in the original dataset by propagating the 80/10/10 split to each combination of positive and negative sentiment.
 ### Part 2: NLP learning based methods (45 pts)
 
-### VADER (5 pts)
+### **VADER (5 pts)**
 
 **Q1: Briefly explaining how this method works (1 pt).** <br>
 VADER (Valence Aware Dictionary and sEntiment Reasoner) is a freely available python package used as a lexicon and rule-based sentiment analysis tool. It is often used in context of social media based data like tweets in order to analyze a piece of text whether word/ statements made have a positive, negative or neutral sentiment. 
@@ -177,11 +177,10 @@ It seems like VADER can deal with all of the raw data without pre-processing and
 
 Additionally, VADER has the advantage to make use of emoticons, UTF-8 encoded emojis, word-shapes, slangs, punctuations and initialisms/acronyms which surely helps to determine the overall sentiment more precisely. Therefore, these text types should not be removed in the pre-processing step.
 
-**Q3: Apply this method to our TweetsCOV19 dataset and comment on the
-performance obtained (2 pts).** <br>
+**Q3: Apply this method to our TweetsCOV19 dataset and comment on the performance obtained (2 pts).** <br>
 
 
-### Word Embeddings (20 pts)
+### **Word Embeddings (20 pts)**
 
 **Q1: Bag of Words (2 pts)** <br>
 
@@ -294,7 +293,7 @@ def load_vectors(fname):
 ft_embeddings = load_vectors('embeddings/wiki-news-300d-1M-subword.vec')
 ```
 
-### Transformers (20 pts) <br>
+### **Transformers (20 pts)** <br>
 
 **Q1: Transformer-based language models (4 pts)** <br>
 
@@ -330,9 +329,10 @@ For the input embedding GPT-3 uses byte pair encoding.
 The Common Crawl dataset is used for pretraining with nearly a trillion words, which dwarves the combined 3.3 billion words of the datasets, on which BERT and RoBERTa were trained.
 
 **Q2: Scalability (2 pts)** <br>
-TODO: Not sure how to answer this question. <br>
-The transformer architecture does not depend on the number of words in the vocabulary. 
-Whereas the embedding-
+TF-IDF and Bag of Words are limited in their scaling capabilities, as their representations of tweets depend on the number of words in the vocabulary.
+In the other embedding methods, one can set the dimension of the embeddings vectors to a fixed size and scale to larger datasets.
+However, the larger the dataset, the more different word vectors there are and thus the training time increases.
+
 
 **Q3: Code (2 pts)** <br>
 
@@ -439,7 +439,7 @@ We sweep across different numbers of neighbors for both the pretrained and fine-
 There is a clear difference in the visualization for the pretrained and the fine-tuned model.
 The fine-tuned model shows a clear separation between words of neutral and positive tweets, whereas in the UMAP plot of the pretrained model, there is no observable separation.
 
-### Part 3: Downstream Global Health Analysis (20 pts)
+### **Part 3: Downstream Global Health Analysis (20 pts)**
 
 **Q1: Research question (2 pts)** <br>
 
@@ -543,7 +543,7 @@ Concluding, one can say that the Twitter sentiment is more sensitive to COVID re
 We treat this problem as multi-class multi-label.
 First we preprocess the data using the same steps as for the sentiment analysis.
 Again we split the data into train (80%), validation(10%) and test(10%) set.
-Our idea is to use our fine-tuned BERT model from the sentiment analysis as pretrained model, since it is already trained on tweets.
+Our idea is to use our best performing fine-tuned BERT model from the sentiment analysis as pretrained model, since it is already trained on tweets.
 ```
 # load pretrained model
 model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", \
@@ -573,4 +573,36 @@ Which is significantly harder in comparison to binary classification.
 
 On the testset we then get an f1 score of 0.7432.
 
-We visualize the UMAP embeddings of different emotions in the following plots.
+We use this model now to predict the probability scores of the emotions for the tweets in the covid19 dataset.
+In the following plot we show the emotion scores averaged
+per week.
+
+![Emotion_Predictions](plots/ea_average_sentiment.png)
+
+For some of the emotions we can observe a trend.
+In several of the curves, there is a sudden change around March of 2020.
+This makes sense, because this is when the first wave of the pandemic hit, causing a lot of uncertainty and anxiety.
+
+In the following we examine stronger emotions trends.
+
+![Emotion_Predictions](plots/ea_strongest_emotions.png)
+
+We see a downtrend in "Joking".
+On the other hand we see an uptrend in "Optimistic", "Anxious" and "Surprise".
+With the exception of "Optimistic", the trends might be explained intuitively by the events during the pandemic.
+For example the reality of the first wave setting in, might have led to people becoming less likely to joke about it.
+And the consequences becoming apparent, might have led to an increase in anxiety.
+For "Optimistic", it would be interesting to look at a longer time period, as we already see a slight downward trend at the end of our time window.
+Perhaps, people were more optimistic at the beginning, in that they thought the pandemic would be over sooner.
+But as we now know, the pandemic and measures to counter it continued for a long time.
+Therefore it would make sense if the downward trend of "Optimistic" at the end continued.
+
+Some further trends can be seen in the following plot.
+![Emotion_Predictions](plots/ea_weak_emotions.png)
+
+An small upward trend is visible for "Thankful" in the spring of 2020.
+Combined with an increase in "Official Report".
+The first wave caused solidarity among people, especially those working in health care were publicly praised. This might explain the increase in "Thankful".
+Naturally this time was also characterized by frequent media coverage, which might explain the increase in "Official Report".
+Finally the temporary dip in "Annoyed" might as well be caused by an understanding of the severity of the situation and the need for measures.
+
