@@ -278,7 +278,7 @@ $$\hat{P}_{ij} = \exp(w_i^T u_j).$$
 So we end up with two vectors $u_i, w_i$ for each word $i$.
 The idea is find $U, W$ such that
 
-$$\hat{P}_{ij} \approx P_{ij}.$$
+$$\hat{P}_{ij} \approx P_{ij}$$
 
 After applying some further steps, one can then define a loss function for optimizing $U, W$ and some bias $b$.
 
