@@ -2,7 +2,8 @@
 
 ### **Part 1: Data pre-processing**
 
-**Q1: Preprocessing (2 pt)** <br> 
+**Q1: Preprocessing (2 pt)**
+
 As a first step we remove all rows, which have NaN entries in the 'TweetText' column of the data.
 Then we remove URLs using regex. 
 Further we replace emojis with their corresponding text using the emoji library.
@@ -86,15 +87,16 @@ def remove_duplicates(data):
     return data.drop_duplicates(subset = ['TweetText'], keep = False)
 ```
 
-**Q2: Exploratory data analysis (1 pts)** <br>
+**Q2: Exploratory data analysis (1 pts)** 
+
 The following plots show the 10 most common unigrams and bigrams before and after preprocessing.
 
 ![uni-bigram-frequencies](plots/uni-bigram-frequencies.png)
+
 The distribution of the unigrams is very similar before and after preprocessing.
 We already see the influence of lowercasing as the unigram 'I' is replaced by 'i'.
 The bigram 'covid 19' has the second highest frequency after preprocessing, but does not show up in the top 10 before preprocessing.
 This is due to the fact that 'covid19' is split into two tokens 'covid' and '19' during our tokenization.
-
 
 ![uni-bigram-frequencies-sentiment](plots/uni-bigram-frequencies-sentiment.png)
 
@@ -105,15 +107,19 @@ The top bigram for the positive tweets is "loved one", which is not present in t
 Another notable bigram is "covid 19", which occurs more often in neutral tweets compared to negative and positive tweets.
 
 The following plot shows how often each sentiment occurs in the dataset.
+
 ![sentiment-distribution](plots/sentiment-distribution.png)
+
 The distribution of the sentiments is very skewed.
 The majority of the tweets are neutral, with a tendency towards positive sentiments.
 Although we can see that there are much more very negative tweets (-4 and -5) than very positive tweets (4 and 5).
 
 Inspecting the distribution of the word counts of the tweets, we notice that the negative and positive tweets have similar distributions, while the neutral tweets tend to be much shorter.
+
 ![wordcount-densities](plots/wordcount-densities.png)
 
-**Q3: Metric Choice (1 pt)** <br>
+**Q3: Metric Choice (1 pt)**
+
 The classes are not balanced, so we will use the class weighted f1 score as metric.
 It fuses the precision and recall into one metric, this makes it especially useful for our unbalanced dataset.
 
@@ -123,18 +129,20 @@ from sklearn.metrics import f1_score
 f1 = f1_score(y_true, y_pred, average='weighted')
 ```
 
-**Q4: Dataset splitting (1 pt)** <br>
+**Q4: Dataset splitting (1 pt)**
+
 After preprocessing we still have around 560k tweets.
 This is a large amount of data so we can afford a 80/10/10 split.
 The validation and test datasets will still contain 56k tweets each, which should give us a good estimate of the general performance of our model. 
 We take care to shuffle the dataset before splitting it, since the tweets are ordered by date.
 This already counters the issue of a potential label shift over time, as we can ensure that the training, validation and test datasets contain an equal amount tweets from all time periods.
 Furthermore we make sure to keep the class distribution as in the original dataset by propagating the 80/10/10 split to each combination of positive and negative sentiment.
-### Part 2: NLP learning based methods (45 pts)
+### **Part 2: NLP learning based methods (45 pts)**
 
 ### **VADER (5 pts)**
 
-**Q1: Briefly explaining how this method works (1 pt).** <br>
+**Q1: Briefly explaining how this method works (1 pt).**
+
 VADER (Valence Aware Dictionary and sEntiment Reasoner) is a freely available python package used as a lexicon and rule-based sentiment analysis tool. It is often used in context of social media based data like tweets in order to analyze a piece of text whether word/ statements made have a positive, negative or neutral sentiment. 
 
 The VADER lexicon consists of a list of words and phrases which got sentiment ratings from 10 independent human raters who provided sentiment scores for over 9’000 token features in a range of -4 (extremely negative) to 4 (extremely positive). In this case, quality control of the ratings was ensured by keeping only lexical features which had a non-zero mean rating and standard deviations less than 2.5. As a result, VADER has a list of over 7’500 lexical token features with scores which both indicate positive or negative valence (score>0 or score<0) and the sentiment intensity of before mentioned range. For example, the word “good” has positive valence and an sentiment intensity score of 1.9.
@@ -166,7 +174,8 @@ Furthermore, we would like to give examples of typical use cases/valence rules f
 
 As a last remark one can point out that VADER works in conjunction with NLTK as well such that VADER can do sentiment analysis on longer texts like for example decomposing paragraphs/articles etc. into sentence-level analyses.
 
-**Q2: Provide a code snippet detailing how to use it for our task (2 pts).** <br>
+**Q2: Provide a code snippet detailing how to use it for our task (2 pts).**
+
 ```
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
@@ -186,8 +195,7 @@ It seems like VADER can deal with all of the raw data without pre-processing and
 
 Additionally, VADER has the advantage to make use of emoticons, UTF-8 encoded emojis, word-shapes, slangs, punctuations and initialisms/acronyms which surely helps to determine the overall sentiment more precisely. Therefore, these text types should not be removed in the pre-processing step.
 
-**Q3: Apply this method to our TweetsCOV19 dataset and comment on the performance obtained (2 pts).** <br>
-
+**Q3: Apply this method to our TweetsCOV19 dataset and comment on the performance obtained (2 pts).**
 
 ### **Word Embeddings (20 pts)**
 
@@ -243,7 +251,7 @@ vectorizer = TfidfVectorizer(max_features=1000)
 X = vectorizer.fit_transform(data['TweetText'])
 ```
 
-**Q4: GloVe (2 pts)** <br>
+**Q4: GloVe (2 pts)**
 
 GloVe uses relies on the occurrence matrix $V$.
 This matrix has the words of the vocabulary as rows and columns.
@@ -271,7 +279,8 @@ with open("embeddings/glove.twitter.27B.200d.txt", 'r') as f:
         vector = np.asarray(values[1:], "float32")
         glove_embeddings[word] = vector
 ```
-**Q5: FastText (2 pts)** <br>
+
+**Q5: FastText (2 pts)**
 
 FastText uses a CBOW model to learn word embeddings.
 But there are several improvements.
@@ -304,7 +313,7 @@ ft_embeddings = load_vectors('embeddings/wiki-news-300d-1M-subword.vec')
 
 ### **Transformers (20 pts)** <br>
 
-**Q1: Transformer-based language models (4 pts)** <br>
+**Q1: Transformer-based language models (4 pts)**
 
 Transformers can consist of a single encoder neural network (BERT), a single decoder network (GPT) or a combination of both (BART).
 Encoder and decoder typically feature a stack of blocks.
@@ -337,12 +346,13 @@ While BERT is fine-tuned for any task on which its performance is evaluated, GPT
 For the input embedding GPT-3 uses byte pair encoding.
 The Common Crawl dataset is used for pretraining with nearly a trillion words, which dwarves the combined 3.3 billion words of the datasets, on which BERT and RoBERTa were trained.
 
-**Q2: Scalability (2 pts)** <br>
+**Q2: Scalability (2 pts)**
+
 TF-IDF and Bag of Words are limited in their scaling capabilities, as their representations of tweets depend on the number of words in the vocabulary.
 In the other embedding methods, one can set the dimension of the embeddings vectors to a fixed size and scale to larger datasets.
 However, the larger the dataset, the more different word vectors there are and thus the training time increases.
 
-**Q3: Code (2 pts)** <br>
+**Q3: Code (2 pts)**
 
 We fine-tuned the BERT model, specifically the bert-base-uncased version (around 100 million parameters), for predicting the positive sentiment of a tweet.
 Because of the limited computational resources, we sample the train dataset down to 5000 tweets and the validation dataset down to 625 tweets.
@@ -412,21 +422,24 @@ The following screenshot shows the training progress for the above configuration
 
 ![training](plots/Transformers_Q3.png)
 
-**Q4: Performance analysis (4 pts)** <br>
+**Q4: Performance analysis (4 pts)**
 
 TODO: Analyze perfomance
+
 ![Predictions](plots/Transformers_Q4.png)
+
 After our fine-tuning we get an f1 score of 0.629 on the test set.
 We propose the following approaches to improve the performance:
 1. fine-tune the entire model.
 2. train the entire model from scratch on our dataset, as it is quite large with around 600k tweets.
 3. add more encoder blocks and attention heads, similar to the scaling of GPT-3, which worked very well.
 
-**Q5: Transfer learning details (3 pts)** <br>
+**Q5: Transfer learning details (3 pts)**
 
 In Q4 we unfroze 3 layers.
 Now we fine-tune with different layers of the encoder unfrozen.
 In the following table we report the performances on the test set.
+
 | Unfrozen Layers  | F1     |
 |------------------|--------|
 | top 3            | 0.6290 |
@@ -440,12 +453,14 @@ On the other hand fine-tuning the bottom layers shows worse performance.
 This is in line with the intuition, that the bottom layers learn more general features, which should not be fine-tuned, while the top layers learn more specific features.
 There is also no benefit in fine-tuning the middle layers, this has even worse performance than fine-tuning the bottom 3 layers.
 
-**Q6: Embedding analysis (6 pts)** <br>
+**Q6: Embedding analysis (6 pts)**
 
 In the following plot, we visualize the word embeddings of 50 positive and 50 neutral tweets with UMAP.
 The embeddings are obtained from the last encoder layer of BERT.
 We sweep across different numbers of neighbors for both the pretrained and fine-tuned model.
+
 ![UMAP_Transformer](plots/UMAP_transformer.png)
+
 There is a clear difference in the visualization for the pretrained and the fine-tuned model.
 The fine-tuned model shows two distinct clusters. 
 Some word representations are clearly recognized as positive in the blue cluster.
@@ -454,11 +469,11 @@ For the pretrained model, we cannot find any clustering of this kind.
 
 ### **Part 3: Downstream Global Health Analysis (20 pts)**
 
-**Q1: Research question (2 pts)** <br>
+**Q1: Research question (2 pts)**
 
 Looking at the paper "Comparing tweet sentiments in megacities using machine learning techniques: In the midst of COVID-19" by Zhirui Yao et al. , we would like to analyze Tweet sentiments during the Covid-19 pandemic as a function of time per city. This topic is of great relevance both for politics and research in psychology. Both these fields seek to predict how crowds behave under certain stresses, such as fear, which is especially useful to understand for politicians in order to adapt or communicate decisions according to the current sentiment present for instance. Furthermore, such analyses might help to enhance predictive capabilities of institutions in order to adapt their communication in situations of high alertness of crowds such that panicking or chaos may be prevented. Additionally, these analyses may also provide different sentiments and compliance to measures in different cities, which may be useful to understand the effectiveness of certain measures in different cities.
 
-**Q2: Method choice and design (5 pts)** <br>
+**Q2: Method choice and design (5 pts)**
 
 As the method of choice, in order to analyze the sentiment of the Tweets we would like to use the VADER sentiment analysis tool. This tool is specifically designed to analyze social media texts and is therefore well suited for our task. Furthermore, we already used this tool and had good experiences with it in the previous questions in terms of that sentiment analysis was performed well. Additionally, one can point out that the VADER tool is already fimiliar with a large corpus of social media texts, which is why it is not necessary to train the model on our dataset. What is more, VADER provides robust classification results irrespective of the length of the text, which is why it is well suited for our task and nearly no pre-processing needs to be done beforehand except for the removal of NaN values.
 
@@ -500,19 +515,19 @@ sentiment_df.drop(['pos', 'neg', 'neu'], axis=1, inplace=True)
 sentiment_df.to_csv('./data/sentiment.csv', index=False)
 ```
 
-**Q3: Results & Analysis (6 pts)** <br>
+**Q3: Results & Analysis (6 pts)**
 
-![Compound/Sentiment freq.](plots\sentiment_freq.png)
+![Compound/Sentiment freq.](plots/sentiment_freq.png)
 
 Looking at our first plot, one can clearly see that the overall sentiment has a maximum frequency roughly around the neutral sentiment. This is surprising because our data is collected using COVID 19 related topics and one would expect that the overall sentiment is rather negative. Moreover, one can see that the overall sentiment is rather positive than negative, due to two high peaks with clearly positive compound values which is also surprising. However, one can see that the overall sentiment is rather close to neutral, which is why we can conclude that the overall sentiment is rather neutral. 
 
-![Sentiment per city whole data](plots\sentiment_per_city_whole_time.png)
+![Sentiment per city whole data](plots/sentiment_per_city_whole_time.png)
 
 Looking at our second plot, we can observe wild fluctuations in the sentiment compound score over time for the different cities. However, one can see that the sentiment compound score is rather close to neutral for all cities, which is why we can conclude that the overall sentiment is rather neutral for all cities. 
 
 Moreover, looking at different cities one can observe differences across the different cities in terms of variance of sentiment over time. On the contrary, one has to point out that not for every city equally much data is available, which is why the variance of sentiment over time may be biased. 
 
-![Barplot whole data](plots\mean_std.dev._whole_time.png)
+![Barplot whole data](plots/mean_std.dev._whole_time.png)
 
 Looking at our barplot, we see the mean sentiment compound score for the different cities. One can conclude that the mean sentiment compound score is often close to neutral for all cities and slightly biased towards positive sentiments. Nevertheless, we see both large differences in the mean sentiment compound score for the different cities as well as large standard deviations. This is surprising because one would expect that the mean sentiment compound score is rather similar for all cities due to the fact that a pandemic is a global phenomenon.
 
@@ -522,14 +537,13 @@ What is more, one can observe an overall trend of a an increasingly relaxed and 
 
 As a result, one can interpret that uncertainty can lead to a negative sentiment in the population whereas strict measures can lead to a more neutral sentiment even though the pandemic is at its peak or even getting worse. This is quite counterintuitive and surprising, which is why further research is needed to understand the underlying mechanisms.
 
-**Q4: Comparison to literature (3 pts)** <br>
+**Q4: Comparison to literature (3 pts)** 
 
-
-![Sentiment per city time period paper](plots\sentiment_city_less_time_as_paper.png)
+![Sentiment per city time period paper](plots/sentiment_city_less_time_as_paper.png)
 
 Our results support the findings of Zhirui Yao et al. in terms of that positive sentiment Tweets from big cities were positively correlated with stricter quarantine measures. In our barplot one can clearly see this correlation during the time period between 2020-03-01 and 2020-05-21. Compared to our barplot using the whole time period available in the Covid-19 dataset, one can see that sentiments are now strictly positive or neutral. One has to point out, that this is during the time of when COVID cases were at its peak and restrictions started to be implemented as described before. 
 
-![Barplot time period paper](plots\mean_std.dev._less_time.png)
+![Barplot time period paper](plots/mean_std.dev._less_time.png)
 
 On the contrary, we could not find this strong correlation in the cities of New York and London as Zhirui Yao et al. did. In our barplot one can see that the mean sentiment compound score is rather close to neutral/ slightly positive for both cities. This might be due to usage of different datasets (in Zhirui Yao et al. case: combination of the Sentiment140 dataset and the Twitter Sentiment Corpus by Sanders (2011)) or different methods applied (we use VADER sentiment analysis tool, whereas Zhirui Yao et al. use a machine learning approach). 
 
@@ -537,13 +551,13 @@ Nevertheless, we can come to the same conclusion as Zhirui Yao et al. in terms o
 
 One possible explanation for this might be that in highly populated megacities people are rather depend on sufficient and effective measures to protect themselves from the virus as they are more exposed to people (eg.: public transportation, supermarkets etc.). This can be an explanation why people are more likely to be positive about stricter quarantine measures than in high populated cities (Zhirui Yao et al., "Comparing tweet sentiments in megacities using machine learning techniques: In the midst of COVID-19", 2021).
 
-**Q5: Discussion (3 pts)** <br>
+**Q5: Discussion (3 pts)**
 
 Our approach has several advantages compared to the one used in the paper. First of all, our approach is more robust in terms of that it does not require any training data. This is due to the fact that we use the VADER sentiment analysis tool, which is already fimiliar with a large corpus of social media texts. Furthermore, our approach is more robust in terms of that it provides robust classification results irrespective of the length of the text. This is due to the fact that we use the VADER sentiment analysis tool, which is specifically designed to analyze social media texts. Moreover, VADER does not require many computational resources, which is why it is very efficient and fast. Additionally, VADER is very easy to use, user friendly and does not require a lot many preprocessing steps. In the paper, the applied models were not able to process effects of slang and emojis which surely would imrove the results.
 
 On the contrary, our approach has a few disadvantages compared to the one used in the paper. First of all, our approach is less flexible in terms of that it is not possible to adjust the sentiment analysis tool to the specific domain of the text. This is due to the fact that we use the VADER sentiment analysis tool, which is specifically designed to analyze social media texts. What is more, our approach is less flexible in terms of that it is not possible to adjust the sentiment analysis tool to the specific language of the text. In this case, VADER is specifically designed to analyze English texts. 
 
-**Q6: Summary & Conclusion (1 pt)** <br>
+**Q6: Summary & Conclusion (1 pt)**
 
 As a summary one can say that the overall sentiment is rather neutral for all cities. However, one can observe wild fluctuations in the sentiment compound score over time for the different cities. Moreover, one can observe an overall trend of a an increasingly relaxed and neutral sentiment during beginning of march until end of april in 2020. This is surprising because according to Zhirui Yao et al. at that time the pandemic was at its peak and one would expect that the sentiment is rather negative. During this month the WHO declared the COVID-19 outbreak a pandemic and the number of cases increased rapidly. Furthermore, during that time stricter measures were implemented in many countries, which is why one would expect that the sentiment is rather negative (Zhirui Yao et al., "Comparing tweet sentiments in megacities using machine learning techniques: In the midst of COVID-19", 2021).
 
@@ -611,6 +625,7 @@ But as we now know, the pandemic and measures to counter it continued for a long
 Therefore it would make sense if the downward trend of "Optimistic" at the end continued.
 
 Some further trends can be seen in the following plot.
+
 ![Emotion_Predictions](plots/ea_weak_emotions.png)
 
 An small upward trend is visible for "Thankful" in the spring of 2020.
