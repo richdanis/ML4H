@@ -197,6 +197,16 @@ Additionally, VADER has the advantage to make use of emoticons, UTF-8 encoded em
 
 **Q3: Apply this method to our TweetsCOV19 dataset and comment on the performance obtained (2 pts).**
 
+In our evalutation of the performance of the VADER package we used the outputted compound score of the package which predicts the overall sentiment of the Tweet. As comparison, we used the labels of our dataset and summed both the positive and negative labels per Tweet to get an overall sentiment score for each Tweet.
+
+
+
+Moreover, we will use the adjusted balanced accuracy score as a metric to evaluate the performance of the package. The adjusted balanced accuracy score is a metric that is used to evaluate the performance of a classifier. It is a balanced accuracy score that is adjusted for chance. 
+
+As a small remark, using the adjusted balanced accuracy score, a score of 1 would mean a perfect performance, while a adjusted score of 0 would mean random guessing. Therefore, with an adjusted balance accuracy score of 0.36 VADER seems to be better than random in classifying the sentiment of twitter texts but there is still a lot of potential to be better. 
+
+As a result, one can say that VADER is a quite good start for classifying sentiments of twitter texts but as one can see it is far away of being a perfect classifier. Reflecting on our applied methods, we used heuristics such as taking the sum of the positive and negative score from the sentiment labels in the TweetsCOV19 dataset and for example interpreted a positive sum as a positive sentiment statement. Furthermore, we applied thresholds described on the VADER GitHub page for the compound scores which helped categorizing compound scores into positive, neutral or negative predictions. 
+
 ### **Word Embeddings (20 pts)**
 
 **Q1: Bag of Words (2 pts)** <br>
