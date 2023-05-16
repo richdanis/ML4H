@@ -446,7 +446,7 @@ The following screenshot shows the training progress for the above configuration
 ![Predictions](plots/Transformers_Q4.png)
 
 After our fine-tuning we get an f1 score of 0.629 on the test set.
-This is better than most of our classifiers in Word Embeddings Q8, with the exception of of the logistic classifier using Bag of Words and TF-IDF embeddings.
+This is better than most of our classifiers in Word Embeddings Q8, with the exception of of the logistic classifier  and the random forest using Bag of Words and TF-IDF embeddings.
 Although this score is reached with only 3 layers of the encoder fine-tuned.
 We propose the following approaches to improve the performance:
 1. fine-tune the entire model.
