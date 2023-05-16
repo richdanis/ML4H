@@ -176,6 +176,7 @@ As a last remark one can point out that VADER works in conjunction with NLTK as 
 
 **Q2: Provide a code snippet detailing how to use it for our task (2 pts).**
 
+**[Code snippet]**
 ```
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
@@ -188,6 +189,7 @@ scores = analyzer.polarity_scores(text)
 print(scores)
 {'neg': 0.0, 'neu': 0.482, 'pos': 0.518, 'compound': 0.8619}
 ```
+
 As one can see, VADER is capable to process whole sentences by applying parts of our pre-processing steps like tokenization which seems to be not necessary anymore. 
 
 Additionally, the overall sentence has a compound score of 0.8619 which means that the sentence has positive valence and a very high positive sentiment intensity (max.: 1).
@@ -197,9 +199,7 @@ Additionally, VADER has the advantage to make use of emoticons, UTF-8 encoded em
 
 **Q3: Apply this method to our TweetsCOV19 dataset and comment on the performance obtained (2 pts).**
 
-In our evalutation of the performance of the VADER package we used the outputted compound score of the package which predicts the overall sentiment of the Tweet. As comparison, we used the labels of our dataset and summed both the positive and negative labels per Tweet to get an overall sentiment score for each Tweet.
-
-
+In our evaluation of the performance of the VADER package we used the outputted compound score of the package which predicts the overall sentiment of the Tweet. As comparison, we used the labels of our dataset and summed both the positive and negative labels per Tweet to get an overall sentiment score for each Tweet.
 
 Moreover, we will use the adjusted balanced accuracy score as a metric to evaluate the performance of the package. The adjusted balanced accuracy score is a metric that is used to evaluate the performance of a classifier. It is a balanced accuracy score that is adjusted for chance. 
 
@@ -209,7 +209,7 @@ As a result, one can say that VADER is a quite good start for classifying sentim
 
 ### **Word Embeddings (20 pts)**
 
-**Q1: Bag of Words (2 pts)** <br>
+**Q1: Bag of Words (2 pts)**
 
 The Bag of Words method establishes the number of occurrences of each word in the dataset and keeps the top n words.
 The columns of the feature map are then the top n words and the rows are the tweets.
@@ -224,11 +224,13 @@ X = vectorizer.fit_transform(data['TweetText']).toarray()
 ```
 We use the count vectorizer of the sklearn library to create the feature map with the Bag of Words method.
 
-**Q2: TF-IDF (2 pts)** <br>
+**Q2: TF-IDF (2 pts)**
 
 In this method, first for each document (or tweet in our case) we calculate the term frequency ($TF$) of each word in the document.
 For a given word $w$ and document $d$ the $TF$ score is given by
+
 $$TF(w, d) = count(w,d) / |d|,$$
+
 where $count(w,d)$ is the number of occurrences of $w$ in $d$ and $|d|$ is the number of words in $d$.
 The TF score tries to capture the importance of a word in a single document.
 
@@ -237,15 +239,19 @@ Here we first calculate the inverse document frequency for each word in the data
 That is for each word we divide the number of all documents in the dataset by the total number of documents containing the word.
 As this inverse score might become very big we apply the logarithm.
 For a given word $w$ and dataset $D$ the IDF score is given by
+
 $$\begin{aligned} IDF(w, D) = log\left(\frac{|D|}{|d \in D : w \in d| + 1}\right),\end{aligned}$$
+
 where $|D|$ is the total number of documents and $|d \in D : w \in d|$ is the number of documents containing $w$.
 In contrast to the $TF$, the $IDF$ measures the importance across documents in the whole dataset.
 
 The final score is then given by combining $TF$ and $IDF$,
+
 $$TF\text{-}IDF(w, d, D) = TF(w, d) \cdot IDF(w, D).$$
 
 Again we use the sklearn library to calculate the scores.
-In order to get a tractable feature matrix, we again restrict the method to the 1000 words with the highest $TF$ across the whole document. <br>
+In order to get a tractable feature matrix, we again restrict the method to the 1000 words with the highest $TF$ across the whole document.
+
 **[Code snippet]**
 ```
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -261,13 +267,18 @@ This matrix has the words of the vocabulary as rows and columns.
 Each cell $V_{ij}$ contains the number of times word $i$ has co-occurred with word $j$ in the dataset.
 
 Now we can model the probability of word $i$ occurring with word $j$ as
+
 $$P_{ij} = \frac{V_{ij}}{V_i},$$
+
 where $V_i$ is the number of times word $i$ has occurred in the dataset.
 Now we introduce two matrices $U, W$ in order to model $P_{ij}$ with
+
 $$\hat{P}_{ij} = \exp(w_i^T u_j).$$
+
 So we end up with two vectors $u_i, w_i$ for each word $i$.
 The idea is find $U, W$ such that each $\hat{P}_{ij}$ is close to $P_{ij}$.
-After applying some further steps, one can then define a loss function for optimizing $U, W$ and some bias $b$. <br>
+After applying some further steps, one can then define a loss function for optimizing $U, W$ and some bias $b$.
+
 **[Code snippet]**
 ```
 glove_embeddings = {}
@@ -310,7 +321,7 @@ def load_vectors(fname):
 ft_embeddings = load_vectors('embeddings/wiki-news-300d-1M-subword.vec')
 ```
 
-### **Transformers (20 pts)** <br>
+### **Transformers (20 pts)**
 
 **Q1: Transformer-based language models (4 pts)**
 
@@ -360,6 +371,8 @@ The following code snippet shows our training configuration.
 We are mostly using default configurations, with some minor changes.
 As the classes are very imbalanced, we are using a class weighted cross entropy loss and subclass the trainer class for this purpose.
 We do not include this in the code snippet to keep it concise.
+
+**[Code snippet]**
 ```
 # download pretrained model
 model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=5).to(device)
@@ -570,6 +583,8 @@ We treat this problem as multi-class multi-label.
 First we preprocess the data using the same steps as for the sentiment analysis.
 Again we split the data into train (80%), validation(10%) and test(10%) set.
 Our idea is to use our best performing fine-tuned BERT model from the sentiment analysis as pretrained model, since it is already trained on tweets.
+
+**[Code snippet]**
 ```
 # load pretrained model
 model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", \
