@@ -368,6 +368,7 @@ We fine-tuned the BERT model, specifically the bert-base-uncased version (around
 Because of the limited computational resources, we sample the train dataset down to 5000 tweets and the validation dataset down to 625 tweets.
 But for inference we let the test set unchanged.
 The following code snippet shows our training configuration.
+We fine-tune the top 3 layers of the encoder, while freezing the rest.
 We are mostly using default configurations, with some minor changes.
 As the classes are very imbalanced, we are using a class weighted cross entropy loss and subclass the trainer class for this purpose.
 We do not include this in the code snippet to keep it concise.
@@ -436,11 +437,11 @@ The following screenshot shows the training progress for the above configuration
 
 **Q4: Performance analysis (4 pts)**
 
-TODO: Analyze perfomance
-
 ![Predictions](plots/Transformers_Q4.png)
 
 After our fine-tuning we get an f1 score of 0.629 on the test set.
+This is better than most of our classifiers in Word Embeddings Q8, with the exception of of the logistic classifier using Bag of Words and TF-IDF embeddings.
+Although this score is reached with only 3 layers of the encoder fine-tuned.
 We propose the following approaches to improve the performance:
 1. fine-tune the entire model.
 2. train the entire model from scratch on our dataset, as it is quite large with around 600k tweets.
@@ -478,6 +479,12 @@ The fine-tuned model shows two distinct clusters.
 Some word representations are clearly recognized as positive in the blue cluster.
 The other cluster seems to contain words from both neutral and positive tweets, these might be words the transformer recognizes as neutral.
 For the pretrained model, we cannot find any clustering of this kind.
+
+Comparing with the t-SNE visualizations in Word Embeddings Q6, we observe that the methods work better for the transformer.
+There is no apparent clustering visible in the t-SNE plots, while the UMAP plots show a clear clustering.
+This might also explain why the transformer performs better than most of our classifiers in Word Embeddings Q8, although there are some exceptions.
+We can conclude that there is structure in the word representations in the transformer, which is not as evident in the word embeddings.
+Therefore th transformer embeddings might prove more useful for downstream tasks.
 
 ### **Part 3: Downstream Global Health Analysis (20 pts)**
 
