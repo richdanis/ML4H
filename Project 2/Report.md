@@ -95,6 +95,15 @@ We already see the influence of lowercasing as the unigram 'I' is replaced by 'i
 The bigram 'covid 19' has the second highest frequency after preprocessing, but does not show up in the top 10 before preprocessing.
 This is due to the fact that 'covid19' is split into two tokens 'covid' and '19' during our tokenization.
 
+
+![uni-bigram-frequencies-sentiment](plots/uni-bigram-frequencies-sentiment.png)
+
+For the different sentiments, the unigram distributions are very similar.
+They are dominated by common words such as "to", "the" and "a".
+For the bigram distributions, we see some slight differences.
+The top bigram for the positive tweets is "loved one", which is not present in the top 10 bigrams of the other sentiments.
+Another notable bigram is "covid 19", which occurs more often in neutral tweets compared to negative and positive tweets.
+
 The following plot shows how often each sentiment occurs in the dataset.
 ![sentiment-distribution](plots/sentiment-distribution.png)
 The distribution of the sentiments is very skewed.
@@ -333,10 +342,11 @@ TF-IDF and Bag of Words are limited in their scaling capabilities, as their repr
 In the other embedding methods, one can set the dimension of the embeddings vectors to a fixed size and scale to larger datasets.
 However, the larger the dataset, the more different word vectors there are and thus the training time increases.
 
-
 **Q3: Code (2 pts)** <br>
 
-We fine-tuned the BERT model for predicting the positive sentiment of a tweet.
+We fine-tuned the BERT model, specifically the bert-base-uncased version (around 100 million parameters), for predicting the positive sentiment of a tweet.
+Because of the limited computational resources, we sample the train dataset down to 5000 tweets and the validation dataset down to 625 tweets.
+But for inference we let the test set unchanged.
 The following code snippet shows our training configuration.
 We are mostly using default configurations, with some minor changes.
 As the classes are very imbalanced, we are using a class weighted cross entropy loss and subclass the trainer class for this purpose.
@@ -415,7 +425,7 @@ We propose the following approaches to improve the performance:
 **Q5: Transfer learning details (3 pts)** <br>
 
 In Q4 we unfroze 3 layers.
-Now we fine-tune with different layers unfrozen.
+Now we fine-tune with different layers of the encoder unfrozen.
 In the following table we report the performances on the test set.
 | Unfrozen Layers  | F1     |
 |------------------|--------|
@@ -437,7 +447,10 @@ The embeddings are obtained from the last encoder layer of BERT.
 We sweep across different numbers of neighbors for both the pretrained and fine-tuned model.
 ![UMAP_Transformer](plots/UMAP_transformer.png)
 There is a clear difference in the visualization for the pretrained and the fine-tuned model.
-The fine-tuned model shows a clear separation between words of neutral and positive tweets, whereas in the UMAP plot of the pretrained model, there is no observable separation.
+The fine-tuned model shows two distinct clusters. 
+Some word representations are clearly recognized as positive in the blue cluster.
+The other cluster seems to contain words from both neutral and positive tweets, these might be words the transformer recognizes as neutral.
+For the pretrained model, we cannot find any clustering of this kind.
 
 ### **Part 3: Downstream Global Health Analysis (20 pts)**
 
@@ -501,7 +514,7 @@ Moreover, looking at different cities one can observe differences across the dif
 
 ![Barplot whole data](plots\mean_std.dev._whole_time.png)
 
-Looking at our barplot, we see the mean sentiment compound score for the different cities. One can conclude that the mean sentiment compound score is often close to neutral for all cities and slightly biased towards positive sentiments. Nevertheless, we see both large differences in the mean sentiment compound score for the different cities as well as large standard deviations. This is surprising because one would expect that the mean sentiment compound score is rather similar for all cities due to the fact that a pandemic is a global phenomenon. 
+Looking at our barplot, we see the mean sentiment compound score for the different cities. One can conclude that the mean sentiment compound score is often close to neutral for all cities and slightly biased towards positive sentiments. Nevertheless, we see both large differences in the mean sentiment compound score for the different cities as well as large standard deviations. This is surprising because one would expect that the mean sentiment compound score is rather similar for all cities due to the fact that a pandemic is a global phenomenon.
 
 Regarding our research question, we can conclude that fluctuations in sentiment across different cities can vary a lot. For example, looking at London one can see that the sentiment is rather stable over time, whereas looking at New York one can see that the sentiment fluctuates a lot. However, one has to point out that not for every city equally much data is available, which is why the variance of sentiment over time may be biased as mentioned before. 
 
@@ -538,7 +551,7 @@ As possible explanation for this might be that in highly populated megacities pe
 
 Concluding, one can say that the Twitter sentiment is more sensitive to COVID restrictions than to the number of COVID cases. This is quite counterintuitive and surprising, which is why further research is needed to understand the underlying mechanisms.
 
-### Bonus: Emotion Analysis (+5 pts)
+### **Bonus: Emotion Analysis (+5 pts)**
 
 We treat this problem as multi-class multi-label.
 First we preprocess the data using the same steps as for the sentiment analysis.
