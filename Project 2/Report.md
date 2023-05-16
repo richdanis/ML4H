@@ -1,5 +1,7 @@
 ## **AI for Global Health using Natural Language Processing**
 
+<p style="text-align: center;">Sven Gutjahr, Christian Bertsch, Richard Danis.</p>
+
 ### **Part 1: Data pre-processing**
 
 **Q1: Preprocessing (2 pt)**
