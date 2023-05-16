@@ -359,8 +359,14 @@ The Common Crawl dataset is used for pretraining with nearly a trillion words, w
 **Q2: Scalability (2 pts)**
 
 TF-IDF and Bag of Words are limited in their scaling capabilities, as their representations of tweets depend on the number of words in the vocabulary.
-In the other embedding methods, one can set the dimension of the embeddings vectors to a fixed size and scale to larger datasets.
-However, the larger the dataset, the more different word vectors there are and thus the training time increases.
+One can set a maximum of words to consider, for example the 1000 most common, but this already limits the predictive capabilities of downstream models.
+In the other embedding methods, this issue is not as prevalent, as the dimensions of the word embeddings can be set to a fixed number.
+However, the larger the dataset, the more different word vectors there are and the longer it takes to train all these word embeddings in word2vec, GloVe and FastText.
+For these methods, in order to speed up training one can also constrain the embeddings to common words, mapping rare words to the same embedding.
+Transformer models can have much more parameters than some of these embedding methods.
+For example GPT-3 with 175 Billion parameters is way bigger than taking for example 2 million word embeddings of 300 dimensions each, which would amount to 600 million parameters.
+But such big models cannot be trained on a single GPU.
+Even BERT with 345 Million parameters can only be trained for small datasets on a single GPU, which is not necessarily the case for the other embedding methods.
 
 **Q3: Code (2 pts)**
 
