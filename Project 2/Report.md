@@ -218,8 +218,7 @@ We use the count vectorizer of the sklearn library to create the feature map wit
 
 In this method, first for each document (or tweet in our case) we calculate the term frequency ($TF$) of each word in the document.
 For a given word $w$ and document $d$ the $TF$ score is given by
-$$ 
-TF(w, d) = count(w,d) / |d|,$$
+$$ TF(w, d) = count(w,d) / |d|,$$
 where $count(w,d)$ is the number of occurrences of $w$ in $d$ and $|d|$ is the number of words in $d$.
 The TF score tries to capture the importance of a word in a single document.
 
@@ -228,18 +227,12 @@ Here we first calculate the inverse document frequency for each word in the data
 That is for each word we divide the number of all documents in the dataset by the total number of documents containing the word.
 As this inverse score might become very big we apply the logarithm.
 For a given word $w$ and dataset $D$ the IDF score is given by
-$$
-\begin{aligned}
-IDF(w, D) = log\left(\frac{|D|}{|d \in D : w \in d| + 1}\right),
-\end{aligned}
-$$
+$$ \begin{aligned} IDF(w, D) = log\left(\frac{|D|}{|d \in D : w \in d| + 1}\right),\end{aligned} $$
 where $|D|$ is the total number of documents and $|d \in D : w \in d|$ is the number of documents containing $w$.
 In contrast to the $TF$, the $IDF$ measures the importance across documents in the whole dataset.
 
 The final score is then given by combining $TF$ and $IDF$,
-$$
-TF\text{-}IDF(w, d, D) = TF(w, d) * IDF(w, D).
-$$
+$$ TF\text{-}IDF(w, d, D) = TF(w, d) \cdot IDF(w, D). $$
 
 Again we use the sklearn library to calculate the scores.
 In order to get a tractable feature matrix, we again restrict the method to the 1000 words with the highest $TF$ across the whole document. <br>
@@ -258,14 +251,10 @@ This matrix has the words of the vocabulary as rows and columns.
 Each cell $V_{ij}$ contains the number of times word $i$ has co-occurred with word $j$ in the dataset.
 
 Now we can model the probability of word $i$ occurring with word $j$ as
-$$
-P_{ij} = \frac{V_{ij}}{V_i},
-$$
+$$ P_{ij} = \frac{V_{ij}}{V_i}, $$
 where $V_i$ is the number of times word $i$ has occurred in the dataset.
 Now we introduce two matrices $U, W$ in order to model $P_{ij}$ with
-$$
-\hat{P}_{ij} = \exp(w_i^T u_j).
-$$
+$$ \hat{P}_{ij} = \exp(w_i^T u_j). $$
 So we end up with two vectors $u_i, w_i$ for each word $i$.
 The idea is find $U, W$ such that each $\hat{P}_{ij}$ is close to $P_{ij}$.
 After applying some further steps, one can then define a loss function for optimizing $U, W$ and some bias $b$. <br>
